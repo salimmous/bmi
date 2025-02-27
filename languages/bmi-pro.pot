@@ -1,0 +1,303 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BMI Calculate Pro\n"
+"POT-Creation-Date: 2024-02-27 21:03+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: includes/admin-settings.php:14
+msgid "BMI Calculator Pro Settings"
+msgstr ""
+
+#: includes/admin-settings.php:15
+msgid "BMI Calculator Pro"
+msgstr ""
+
+#: includes/admin-settings.php:36
+msgid "General Settings"
+msgstr ""
+
+#: includes/admin-settings.php:44
+msgid "API Key"
+msgstr ""
+
+#: includes/admin-settings.php:52
+msgid "Enable AI Features"
+msgstr ""
+
+#: includes/admin-settings.php:61
+msgid "Configure general settings for BMI Calculator Pro."
+msgstr ""
+
+#: includes/dashboard-analytics.php:14
+msgid "BMI Calculator Pro Analytics"
+msgstr ""
+
+#: includes/dashboard-analytics.php:41
+msgid "Underweight"
+msgstr ""
+
+#: includes/dashboard-analytics.php:42
+msgid "Normal"
+msgstr ""
+
+#: includes/dashboard-analytics.php:43
+msgid "Overweight"
+msgstr ""
+
+#: includes/dashboard-analytics.php:44
+msgid "Obese"
+msgstr ""
+
+#: includes/dashboard-analytics.php:57
+#, php-format
+msgid "Total Entries: %d"
+msgstr ""
+
+#: includes/dashboard-analytics.php:58
+#, php-format
+msgid "Average BMI: %.2f"
+msgstr ""
+
+#: includes/dashboard-analytics.php:66
+msgid "BMI Distribution"
+msgstr ""
+
+#: includes/fitbit-integration.php:14
+msgid "Fitbit Integration"
+msgstr ""
+
+#: includes/fitbit-integration.php:22
+msgid "Client ID"
+msgstr ""
+
+#: includes/fitbit-integration.php:30
+msgid "Client Secret"
+msgstr ""
+
+#: includes/fitbit-integration.php:39
+msgid "Configure Fitbit integration settings for BMI Calculator Pro."
+msgstr ""
+
+#: includes/user-settings.php:14
+msgid "BMI Calculator Pro User Settings"
+msgstr ""
+
+#: includes/user-settings.php:15
+msgid "BMI Settings"
+msgstr ""
+
+#: includes/user-settings.php:33
+msgid "Height (cm)"
+msgstr ""
+
+#: includes/user-settings.php:36
+msgid "Weight (kg)"
+msgstr ""
+
+#: includes/user-settings.php:39
+msgid "Fitness Goal"
+msgstr ""
+
+#: includes/user-settings.php:41
+msgid "Weight Loss"
+msgstr ""
+
+#: includes/user-settings.php:42
+msgid "Muscle Gain"
+msgstr ""
+
+#: includes/user-settings.php:43
+msgid "Maintain"
+msgstr ""
+
+#: includes/user-settings.php:46
+msgid "Save Settings"
+msgstr ""
+
+#: includes/ai-handler.php:30
+msgid "AI Integration (Placeholder)"
+msgstr ""
+
+#: includes/ai-handler.php:38
+msgid "AI API Key (Placeholder)"
+msgstr ""
+
+#: includes/ai-handler.php:47
+msgid "Configure AI integration settings for BMI Calculator Pro (Placeholder)."
+msgstr ""
+
+#: templates/user-form.php:9
+msgid "Personal Details"
+msgstr ""
+
+#: templates/user-form.php:12
+msgid "Name"
+msgstr ""
+
+#: templates/user-form.php:15
+msgid "Email"
+msgstr ""
+
+#: templates/user-form.php:20
+msgid "Phone"
+msgstr ""
+
+#: templates/user-form.php:23
+msgid "Age"
+msgstr ""
+
+#: templates/user-form.php:28
+msgid "Gender"
+msgstr ""
+
+#: templates/user-form.php:30
+#: templates/user-form.php:31
+msgid "Male"
+msgstr ""
+
+#: templates/user-form.php:32
+msgid "Female"
+msgstr ""
+
+#: templates/user-form.php:35
+msgid "Height (in cm)"
+msgstr ""
+
+#: templates/user-form.php:40
+msgid "Weight (in kg)"
+msgstr ""
+
+#: templates/user-form.php:43
+msgid "Fitness Goal"
+msgstr ""
+
+#: templates/user-form.php:45
+#: templates/results-page.php:44
+msgid "Weight Loss"
+msgstr ""
+
+#: templates/user-form.php:46
+#: templates/results-page.php:45
+msgid "Muscle Gain"
+msgstr ""
+
+#: templates/user-form.php:47
+msgid "Overall Health"
+msgstr ""
+
+#: templates/user-form.php:53
+msgid "Calories per day"
+msgstr ""
+
+#: templates/user-form.php:56
+msgid "Diet Preference"
+msgstr ""
+
+#: templates/user-form.php:58
+msgid "Vegetarian"
+msgstr ""
+
+#: templates/user-form.php:59
+msgid "Vegan"
+msgstr ""
+
+#: templates/user-form.php:60
+msgid "Paleo"
+msgstr ""
+
+#: templates/user-form.php:61
+msgid "Keto"
+msgstr ""
+
+#: templates/user-form.php:62
+msgid "Low Carb"
+msgstr ""
+
+#: templates/user-form.php:63
+msgid "Other"
+msgstr ""
+
+#: templates/user-form.php:69
+msgid "Activity Level"
+msgstr ""
+
+#: templates/user-form.php:71
+msgid "Sedentary"
+msgstr ""
+
+#: templates/user-form.php:72
+msgid "Lightly Active"
+msgstr ""
+
+#: templates/user-form.php:73
+msgid "Moderately Active"
+msgstr ""
+
+#: templates/user-form.php:74
+msgid "Very Active"
+msgstr ""
+
+#: templates/user-form.php:75
+msgid "Extra Active"
+msgstr ""
+
+#: templates/user-form.php:78
+msgid "Gym Sessions per Week"
+msgstr ""
+
+#: templates/user-form.php:82
+msgid "Time in Gym (hours per session)"
+msgstr ""
+
+#: templates/user-form.php:85
+msgid "Hours of Sleep"
+msgstr ""
+
+#: templates/user-form.php:90
+msgid "Emotional State"
+msgstr ""
+
+#: templates/user-form.php:94
+msgid "Calculate Now"
+msgstr ""
+
+#: templates/results-page.php:10
+#: templates/results-page.php:41
+msgid "Results"
+msgstr ""
+
+#: templates/results-page.php:19
+msgid "Category"
+msgstr ""
+
+#: templates/results-page.php:20
+msgid "Details"
+msgstr ""
+
+#: templates/results-page.php:24
+#: templates/results-page.php:42
+msgid "BMI"
+msgstr ""
+
+#: templates/results-page.php:28
+msgid "BFP"
+msgstr ""
+
+#: templates/results-page.php:32
+msgid "BMR"
+msgstr ""
+
+#: templates/results-page.php:36
+msgid "Ideal Weight"
+msgstr ""
+
+#: templates/results-page.php:40
+msgid "Recommendations"
+msgstr ""

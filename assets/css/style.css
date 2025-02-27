@@ -1,0 +1,121 @@
+.bmi-calculator-pro {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.bmi-calculator-pro h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.bmi-calculator-pro .form-group {
+  margin-bottom: 15px;
+}
+
+.bmi-calculator-pro label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.bmi-calculator-pro input[type="text"],
+.bmi-calculator-pro input[type="email"],
+.bmi-calculator-pro input[type="tel"],
+.bmi-calculator-pro input[type="number"],
+.bmi-calculator-pro select,
+.bmi-calculator-pro textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.bmi-calculator-pro select {
+  height: 40px;
+}
+
+.bmi-calculator-pro textarea {
+  height: 100px;
+}
+
+.bmi-calculator-pro button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.bmi-calculator-pro button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.bmi-results-pro {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.bmi-results-pro h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.bmi-results-pro .results-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bmi-results-pro .results-table .table-header {
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+.bmi-results-pro .results-table .table-row {
+  border-bottom: 1px solid #eee;
+}
+.bmi-results-pro .results-table .table-row.recommendations{
+   border-bottom: none;
+}
+
+.bmi-results-pro .results-table .table-row > div {
+  padding: 10px;
+}
+
+.bmi-results-pro .results-table .table-row > div:first-child {
+  width: 30%;
+}
+
+.bmi-results-pro .results-table .table-row > div:last-child {
+  width: 70%;
+}
+
+/* Style for the error messages */
+.bmi-error {
+    color: red;
+    margin-top: 5px;
+}
+/* Style for the result messages */
+.bmi-result {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#bmi-gauge-container {
+  width: 300px;
+  height: 200px;
+  margin: 20px auto;
+}
