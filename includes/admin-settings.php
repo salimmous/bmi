@@ -1,101 +1,115 @@
 <?php
-    // Security: Exit if accessed directly
-    if ( ! defined( 'ABSPATH' ) ) {
-        exit;
+// Security: Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+// Add admin menu page
+function bmi_pro_add_admin_menu() {
+	add_menu_page(
+		__( 'BMI Calculator Pro Settings', 'bmi-pro' ),
+		__( 'BMI Calculator Pro', 'bmi-pro' ),
+		'manage_options',
+		'bmi-calculator-pro',
+		'bmi_pro_settings_page_callback',
+		'dashicons-chart-line',
+		6
+	);
+}
+
+// Callback function for the settings page
+function bmi_pro_settings_page_callback() {
+    // Check user capabilities
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
     }
 
-    // Add admin menu page
-    function bmi_pro_add_admin_menu() {
-        add_menu_page(
-            __( 'BMI Calculator Pro Settings', 'bmi-pro' ),
-            __( 'BMI Calculator Pro', 'bmi-pro' ),
-            'manage_options',
-            'bmi-calculator-pro',
-            'bmi_pro_admin_page_callback',
-            'dashicons-calculator',
-            6
-        );
-    }
-    add_action( 'admin_menu', 'bmi_pro_add_admin_menu' );
+    // Save settings if form is submitted
+    if ( isset( $_POST['bmi_pro_settings_nonce'] ) && wp_verify_nonce( $_POST['bmi_pro_settings_nonce'], 'bmi_pro_save_settings' ) ) {
+        // Sanitize and save general settings
+        $api_key = isset( $_POST['bmi_pro_api_key'] ) ? sanitize_text_field( $_POST['bmi_pro_api_key'] ) : '';
+        $enable_ai = isset( $_POST['bmi_pro_enable_ai'] ) ? 1 : 0;
 
-    // Callback function for the admin page
-    function bmi_pro_admin_page_callback() {
-        ?>
-        <div class="wrap">
-            <h1><?php esc_html_e( 'BMI Calculator Pro Settings', 'bmi-pro' ); ?></h1>
-            <form method="post" action="options.php">
-                <?php
-                settings_fields( 'bmi_pro_settings_group' );
-                do_settings_sections( 'bmi-calculator-pro' );
-                submit_button();
-                ?>
-            </form>
-        </div>
-        <?php
+        update_option( 'bmi_pro_api_key', $api_key );
+        update_option( 'bmi_pro_enable_ai', $enable_ai );
+
+        // Sanitize and save Fitbit settings
+        $fitbit_client_id = isset( $_POST['bmi_pro_fitbit_client_id'] ) ? sanitize_text_field( $_POST['bmi_pro_fitbit_client_id'] ) : '';
+        $fitbit_client_secret = isset( $_POST['bmi_pro_fitbit_client_secret'] ) ? sanitize_text_field( $_POST['bmi_pro_fitbit_client_secret'] ) : '';
+
+        update_option( 'bmi_pro_fitbit_client_id', $fitbit_client_id );
+        update_option( 'bmi_pro_fitbit_client_secret', $fitbit_client_secret );
+
+        // Sanitize and save AI settings (Placeholder)
+        $ai_api_key = isset( $_POST['bmi_pro_ai_api_key'] ) ? sanitize_text_field( $_POST['bmi_pro_ai_api_key'] ) : '';
+        update_option( 'bmi_pro_ai_api_key', $ai_api_key ); // Placeholder
+
+        // Display a success message
+        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'bmi-pro' ) . '</p></div>';
     }
 
-    // Register settings
-    function bmi_pro_register_settings() {
-        register_setting(
-            'bmi_pro_settings_group',
-            'bmi_pro_settings',
-            'bmi_pro_sanitize_settings'
-        );
-
-        add_settings_section(
-            'bmi_pro_general_section',
-            __( 'General Settings', 'bmi-pro' ),
-            'bmi_pro_general_section_callback',
-            'bmi-calculator-pro'
-        );
-
-        add_settings_field(
-            'api_key',
-            __( 'API Key', 'bmi-pro' ),
-            'bmi_pro_api_key_callback',
-            'bmi-calculator-pro',
-            'bmi_pro_general_section'
-        );
-
-      add_settings_field(
-        'enable_ai',
-        __( 'Enable AI Features', 'bmi-pro' ),
-        'bmi_pro_enable_ai_callback',
-        'bmi-calculator-pro',
-        'bmi_pro_general_section'
-      );
-    }
-    add_action( 'admin_init', 'bmi_pro_register_settings' );
-
-    // Callback for the general section
-    function bmi_pro_general_section_callback() {
-        echo '<p>' . esc_html__( 'Configure general settings for BMI Calculator Pro.', 'bmi-pro' ) . '</p>';
-    }
-
-    // Callback for the API key field
-    function bmi_pro_api_key_callback() {
-        $options = get_option( 'bmi_pro_settings' );
-        $api_key = isset( $options['api_key'] ) ? $options['api_key'] : '';
-        echo "<input type='text' name='bmi_pro_settings[api_key]' value='" . esc_attr( $api_key ) . "' class='regular-text' />";
-    }
-    // Callback for the enable AI checkbox
-    function bmi_pro_enable_ai_callback() {
-      $options = get_option( 'bmi_pro_settings' );
-      $enable_ai = isset( $options['enable_ai'] ) ? $options['enable_ai'] : 0;
-      echo "<input type='checkbox' name='bmi_pro_settings[enable_ai]' value='1' " . checked( 1, $enable_ai, false ) . " />";
-    }
-
-    // Sanitize settings
-    function bmi_pro_sanitize_settings( $input ) {
-        $sanitized_input = array();
-
-        if ( isset( $input['api_key'] ) ) {
-            $sanitized_input['api_key'] = sanitize_text_field( $input['api_key'] );
-        }
-      if ( isset( $input['enable_ai'] ) ) {
-        $sanitized_input['enable_ai'] = intval( $input['enable_ai'] ); // Ensure it's 0 or 1
-      }
-
-        return $sanitized_input;
-    }
+    // Retrieve current settings
+    $api_key             = get_option( 'bmi_pro_api_key', '' );
+    $enable_ai           = get_option( 'bmi_pro_enable_ai', 0 );
+    $fitbit_client_id    = get_option( 'bmi_pro_fitbit_client_id', '' );
+    $fitbit_client_secret = get_option( 'bmi_pro_fitbit_client_secret', '' );
+    $ai_api_key          = get_option( 'bmi_pro_ai_api_key', '' ); // Placeholder
     ?>
+    <div class="wrap">
+        <h1><?php echo esc_html__( 'BMI Calculator Pro Settings', 'bmi-pro' ); ?></h1>
+
+        <form method="post" action="">
+            <?php wp_nonce_field( 'bmi_pro_save_settings', 'bmi_pro_settings_nonce' ); ?>
+
+            <h2><?php echo esc_html__( 'General Settings', 'bmi-pro' ); ?></h2>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="bmi_pro_api_key"><?php echo esc_html__( 'API Key', 'bmi-pro' ); ?></label></th>
+                    <td>
+                        <input type="text" id="bmi_pro_api_key" name="bmi_pro_api_key" value="<?php echo esc_attr( $api_key ); ?>" class="regular-text">
+                        <p class="description"><?php echo esc_html__( 'Enter your API key for external services.', 'bmi-pro' ); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="bmi_pro_enable_ai"><?php echo esc_html__( 'Enable AI Features', 'bmi-pro' ); ?></label></th>
+                    <td>
+                        <input type="checkbox" id="bmi_pro_enable_ai" name="bmi_pro_enable_ai" value="1" <?php checked( $enable_ai, 1 ); ?>>
+                        <p class="description"><?php echo esc_html__( 'Enable AI-powered features (if available).', 'bmi-pro' ); ?></p>
+                    </td>
+                </tr>
+            </table>
+
+            <h2><?php echo esc_html__( 'Fitbit Integration', 'bmi-pro' ); ?></h2>
+            <p><?php echo esc_html__( 'Configure Fitbit integration settings for BMI Calculator Pro.', 'bmi-pro' ); ?></p>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="bmi_pro_fitbit_client_id"><?php echo esc_html__( 'Client ID', 'bmi-pro' ); ?></label></th>
+                    <td>
+                        <input type="text" id="bmi_pro_fitbit_client_id" name="bmi_pro_fitbit_client_id" value="<?php echo esc_attr( $fitbit_client_id ); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="bmi_pro_fitbit_client_secret"><?php echo esc_html__( 'Client Secret', 'bmi-pro' ); ?></label></th>
+                    <td>
+                        <input type="text" id="bmi_pro_fitbit_client_secret" name="bmi_pro_fitbit_client_secret" value="<?php echo esc_attr( $fitbit_client_secret ); ?>" class="regular-text">
+                    </td>
+                </tr>
+            </table>
+
+            <h2><?php echo esc_html__( 'AI Integration (Placeholder)', 'bmi-pro' ); ?></h2>
+            <p><?php echo esc_html__( 'Configure AI integration settings for BMI Calculator Pro (Placeholder).', 'bmi-pro' ); ?></p>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="bmi_pro_ai_api_key"><?php echo esc_html__( 'AI API Key (Placeholder)', 'bmi-pro' ); ?></label></th>
+                    <td>
+                        <input type="text" id="bmi_pro_ai_api_key" name="bmi_pro_ai_api_key" value="<?php echo esc_attr( $ai_api_key ); ?>" class="regular-text">
+                    </td>
+                </tr>
+            </table>
+
+            <?php submit_button( __( 'Save Changes', 'bmi-pro' ) ); ?>
+        </form>
+    </div>
+    <?php
+}
+?>

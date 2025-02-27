@@ -114,4 +114,8 @@ require_once BMI_PRO_PLUGIN_DIR . 'includes/dashboard-analytics.php';
 require_once BMI_PRO_PLUGIN_DIR . 'includes/user-settings.php';
 require_once BMI_PRO_PLUGIN_DIR . 'includes/fitbit-integration.php';
 require_once BMI_PRO_PLUGIN_DIR . 'includes/ai-handler.php';
+
+// Add admin menu and dashboard widget
+add_action( 'admin_menu', 'bmi_pro_add_admin_menu' );
+add_action( 'wp_dashboard_setup', 'bmi_pro_add_dashboard_widget' );
 ?>
