@@ -67,7 +67,7 @@ msgid "Average BMI: %.2f"
 msgstr ""
 
 #: includes/dashboard-analytics.php:66
-msgid "BMI Distribution"
+msgmsgid "BMI Distribution"
 msgstr ""
 
 #: includes/fitbit-integration.php:14

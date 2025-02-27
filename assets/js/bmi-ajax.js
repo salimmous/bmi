@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
         'activity_level'    : $('#activity_level').val(),
         'gym_sessions_per_week' : $('#gym_sessions_per_week').val(),
         'time_in_gym'       => $('#time_in_gym').val(),
-        'hours_of_sleep'    : $('#hours_of_sleep').val(),
+        'hours_of_sleep'    => $('#hours_of_sleep').val(),
         'emotional_state'   : $('#emotional_state').val(),
     };
 

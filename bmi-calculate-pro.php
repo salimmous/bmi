@@ -2,10 +2,12 @@
     /**
      * Plugin Name: BMI Calculate Pro
      * Description: A comprehensive BMI calculator plugin with advanced features.
-     * Version: 1.0.0
+     * Version: 1.0.1
      * Author: Salim Moustanir
      * Text Domain: bmi-pro
      * Domain Path: /languages
+     * GitHub Plugin URI: https://github.com/YOUR_USERNAME/YOUR_REPOSITORY
+     * GitHub Branch: main  
      */
 
     // Security: Exit if accessed directly
