@@ -1,53 +1,75 @@
 <?php
-    // Security: Exit if accessed directly
-    if ( ! defined( 'ABSPATH' ) ) {
-        exit;
+if (!defined('ABSPATH')) exit;
+
+/**
+ * Handle API test AJAX requests
+ */
+function bmi_pro_test_api_handler() {
+    $ai_service = get_option('bmi_ai_service', 'chatgpt'); // Default to ChatGPT
+    $api_key = get_option('bmi_ai_api_key', '');
+
+    if (empty($api_key)) {
+        wp_send_json_error(['message' => 'API key is missing. Please configure it in the settings.']);
     }
 
-    /**
-     * Get AI-powered recommendations.
-     * This is a placeholder for the actual AI integration.
-     * In a real-world scenario, this function would interact with an external AI service.
-     *
-     * @param array $user_data User data.
-     * @return string AI-powered recommendations.
-     */
-    function get_ai_recommendations( $user_data ) {
-        // Placeholder implementation
-        $recommendations = "This is a placeholder for AI-powered recommendations. ";
-        $recommendations .= "Based on your input, we suggest consulting with a healthcare professional for personalized advice.";
+    // Define API endpoints and payloads
+    $endpoint = '';
+    $payload = [];
 
-        return $recommendations;
+    switch ($ai_service) {
+        case 'chatgpt':
+            $endpoint = 'https://api.openai.com/v1/completions';
+            $payload = json_encode([
+                'model' => 'text-davinci-003',
+                'prompt' => 'This is a test message for API connection.',
+                'max_tokens' => 10,
+                'temperature' => 0.7,
+            ]);
+            break;
+
+        case 'gemini':
+            $endpoint = 'https://api.gemini.com/v1/test';
+            $payload = json_encode(['test' => 'This is a test message for Gemini.']);
+            break;
+
+        case 'aimlapi':
+            $endpoint = 'https://api.aimlapi.com/v1/test';
+            $payload = json_encode(['test' => 'This is a test message for AIMLAPI.']);
+            break;
+
+        default:
+            wp_send_json_error(['message' => 'Invalid AI service selected.']);
     }
 
-    // Add AI settings to admin page (Placeholder)
-    function bmi_pro_add_ai_settings() {
-        add_settings_section(
-            'bmi_pro_ai_section',
-            __( 'AI Integration (Placeholder)', 'bmi-pro' ),
-            'bmi_pro_ai_section_callback',
-            'bmi-calculator-pro'
-        );
+    // Make API request
+    $response = wp_remote_post($endpoint, [
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $api_key,
+        ],
+        'body' => $payload,
+    ]);
 
-        add_settings_field(
-            'ai_api_key',
-            __( 'AI API Key (Placeholder)', 'bmi-pro' ),
-            'bmi_pro_ai_api_key_callback',
-            'bmi-calculator-pro',
-            'bmi_pro_ai_section'
-        );
-    }
-    add_action( 'admin_init', 'bmi_pro_add_ai_settings' );
-
-    // Callback for the AI section (Placeholder)
-    function bmi_pro_ai_section_callback() {
-        echo '<p>' . esc_html__( 'Configure AI integration settings for BMI Calculator Pro (Placeholder).', 'bmi-pro' ) . '</p>';
+    if (is_wp_error($response)) {
+        wp_send_json_error(['message' => 'Failed to connect to the API. Error: ' . $response->get_error_message()]);
     }
 
-    // Callback for the AI API Key field (Placeholder)
-    function bmi_pro_ai_api_key_callback() {
-        $options = get_option( 'bmi_pro_settings' );
-        $ai_api_key = isset( $options['ai_api_key'] ) ? $options['ai_api_key'] : '';
-        echo "<input type='text' name='bmi_pro_settings[ai_api_key]' value='" . esc_attr( $ai_api_key ) . "' class='regular-text' />";
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+
+    // Log API response for debugging
+    error_log('API Response: ' . print_r($data, true));
+
+    // Parse and handle the response based on the AI service
+    if ($ai_service === 'chatgpt' && isset($data['choices'][0]['text'])) {
+        wp_send_json_success(['message' => 'ChatGPT API connected successfully. Response: ' . $data['choices'][0]['text']]);
+    } elseif ($ai_service === 'gemini' && isset($data['status']) && $data['status'] === 'success') {
+        wp_send_json_success(['message' => 'Gemini API connected successfully.']);
+    } elseif ($ai_service === 'aimlapi' && isset($data['status']) && $data['status'] === 'success') {
+        wp_send_json_success(['message' => 'AIMLAPI connected successfully.']);
+    } else {
+        wp_send_json_error(['message' => 'Unexpected response from ' . $ai_service . '.']);
     }
-    ?>
+}
+
+add_action('wp_ajax_bmi_pro_test_api', 'bmi_pro_test_api_handler');

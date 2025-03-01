@@ -1,60 +1,68 @@
-jQuery(document).ready(function($) {
-  $('#bmi-form').submit(function(event) {
-    event.preventDefault();
+document.getElementById("bmi-calculator-form").addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent form submission
 
-    // Collect all form data
-    var formData = {
-      'action'              : 'bmi_calculate',
-        'nonce'             : bmi_ajax_obj.nonce,
-        'name'              : $('#name').val(),
-        'email'             : $('#email').val(),
-        'phone'             : $('#phone').val(),
-        'age'               : $('#age').val(),
-        'gender'            : $('#gender').val(),
-        'height'            : $('#height').val(),
-        'weight'            : $('#weight').val(),
-        'fitness_goal'      : $('#fitness_goal').val(),
-        'calories_per_day' : $('#calories_per_day').val(),
-        'diet_preference'   : $('#diet_preference').val(),
-        'activity_level'    : $('#activity_level').val(),
-        'gym_sessions_per_week' : $('#gym_sessions_per_week').val(),
-        'time_in_gym'       => $('#time_in_gym').val(),
-        'hours_of_sleep'    => $('#hours_of_sleep').val(),
-        'emotional_state'   : $('#emotional_state').val(),
-    };
+    // Show loading indicator
+    const submitBtn = document.querySelector('.submit-btn');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner"></span> Calculating...';
+    submitBtn.disabled = true;
 
-    $.ajax({
-      type: 'POST',
-      url: bmi_ajax_obj.ajax_url,
-      data: formData,
-      dataType: 'json',
-      beforeSend: function() {
-        // Clear previous results and errors
-        $('.bmi-error').remove();
-        $('.bmi-result').remove();
-      },
-      success: function(response) {
-        if (response.success) {
-          // Display results
-          $('#result-bmi').text(response.data.bmi);
-          $('#result-bfp').text(response.data.bfp);
-          $('#result-bmr').text(response.data.bmr);
-          $('#result-ideal-weight').text(response.data.ideal_weight);
-          $('#result-recommendations').text(response.data.recommendations);
-          // Update the gauge
-          updateBMIGauge(parseFloat(response.data.bmi));
+    // Serialize the form data
+    const formData = new URLSearchParams(new FormData(this)).toString();
+    
+    // Create the data object for the AJAX request
+    const requestData = new FormData();
+    requestData.append('action', 'bmi_pro_calculate');
+    requestData.append('nonce', document.getElementById('bmi-nonce').value);
+    requestData.append('data', formData);
 
+    // Send the AJAX request
+    fetch(bmi_ajax_object.ajax_url, {
+        method: 'POST',
+        body: requestData,
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        // Reset button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+
+        if (data.success) {
+            // Update the UI with the results
+            const results = data.data;
+            document.getElementById("bmi-value").innerText = results.bmi || "N/A";
+            document.getElementById("bfp-value").innerText = results.bfp || "N/A";
+            document.getElementById("bmr-value").innerText = results.bmr || "N/A";
+            document.getElementById("ideal-weight").innerText = results.ideal_weight || "N/A";
+            document.getElementById("recommendations").innerText = results.recommendations || "N/A";
+            
+            // Update the BMI gauge
+            updateBMIGauge(parseFloat(results.bmi));
+            
+            // Update progress chart if it exists
+            if (typeof updateProgressChart === 'function') {
+                updateProgressChart(parseFloat(results.bmi));
+            }
+            
+            // Show the results section with animation
+            const resultSection = document.querySelector('.result-section');
+            resultSection.classList.add('show-results');
+            
+            // Scroll to results
+            resultSection.scrollIntoView({ behavior: 'smooth' });
         } else {
-          // Display errors
-          $.each(response.data.errors, function(index, error) {
-            $('#bmi-form').prepend('<p class="bmi-error">' + error + '</p>');
-          });
+            alert("Error: " + (data.message || "An unexpected error occurred."));
         }
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log(textStatus, errorThrown);
-        $('#bmi-form').prepend('<p class="bmi-error">An error occurred: ' + errorThrown + '</p>');
-      }
+    })
+    .catch((error) => {
+        // Reset button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+        
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
     });
-  });
 });
+
+// This code is replaced by the bmi-gauge.js implementation
+// The gauge initialization and updates are now handled by updateBMIGauge function

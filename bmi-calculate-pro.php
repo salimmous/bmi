@@ -1,36 +1,24 @@
 <?php
-/**
- * Plugin Name: BMI Calculate Pro
- * Description: A professional BMI calculator with AI-powered recommendations, customizable settings, and database integration.
- * Version: 1.0
- * Author: Your Name
- */
+/*
+Plugin Name: BMI Calculate Pro
+Description: A professional BMI calculator with AI-powered recommendations, customizable settings, and database integration.
+Version: 1.0
+Author: Your Name
+*/
 
-// Security: Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
-// Plugin constants
-define( 'BMI_PRO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'BMI_PRO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-
-/**
- * Load plugin textdomain.
- */
-function bmi_pro_load_textdomain() {
-    load_plugin_textdomain( 'bmi-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-}
-add_action( 'plugins_loaded', 'bmi_pro_load_textdomain' );
+// Define plugin constants
+define('BMI_PRO_VERSION', '1.0');
+define('BMI_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('BMI_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Include necessary files
-require_once BMI_PRO_PLUGIN_DIR . 'includes/calculator-functions.php';
+require_once BMI_PRO_PLUGIN_DIR . 'includes/class-bmi-logger.php';
 require_once BMI_PRO_PLUGIN_DIR . 'includes/form-handler.php';
 require_once BMI_PRO_PLUGIN_DIR . 'includes/admin-settings.php';
 require_once BMI_PRO_PLUGIN_DIR . 'includes/dashboard-analytics.php';
-require_once BMI_PRO_PLUGIN_DIR . 'includes/user-settings.php';
-require_once BMI_PRO_PLUGIN_DIR . 'includes/fitbit-integration.php';
-require_once BMI_PRO_PLUGIN_DIR . 'includes/ai-handler.php';
+require_once BMI_PRO_PLUGIN_DIR . 'includes/class-bmi-update-checker.php';
 
 // Shortcode for the BMI Calculator
 function bmi_calculate_pro_shortcode() {
@@ -40,7 +28,7 @@ function bmi_calculate_pro_shortcode() {
 <div class="form-section">
     <h2 class="section-title"><?php echo __('Personal Details', 'bmi-pro'); ?></h2>
     <form id="bmi-calculator-form" method="POST" action="">
-
+        
         <!-- Row 1: Name, Email -->
         <div class="input-row">
             <div class="input-item">
@@ -181,6 +169,16 @@ function bmi_calculate_pro_shortcode() {
                     </tr>
                 </tbody>
             </table>
+            
+            <!-- Progress Tracking Section -->
+            <div class="progress-section">
+                <h3><?php echo __('BMI Progress Tracking', 'bmi-pro'); ?></h3>
+                <div id="bmi-progress-indicator" class="progress-indicator-container"></div>
+                <div class="chart-container" style="position: relative; height: 300px; margin: 20px auto;">
+                    <canvas id="bmi-progress-chart"></canvas>
+                </div>
+                <p class="progress-note"><?php echo __('Your BMI progress is tracked automatically. Check back after your next measurement to see your progress!', 'bmi-pro'); ?></p>
+            </div>
         </div>
     </div>
     <?php
@@ -191,10 +189,12 @@ add_shortcode('bmi_calculate_pro', 'bmi_calculate_pro_shortcode');
 // Enqueue CSS and JavaScript
 if (!function_exists('bmi_enqueue_styles_scripts')) {
     function bmi_enqueue_styles_scripts() {
-        wp_enqueue_style('bmi-style', plugin_dir_url(__FILE__) . 'assets/css/style.css');
-        wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', [], null, true);
-        wp_enqueue_script('bmi-ajax-script', plugin_dir_url(__FILE__) . 'assets/js/bmi-ajax.js', ['jquery'], null, true);
         wp_enqueue_style('bmi-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', [], time(), 'all');
+        wp_enqueue_style('bmi-progress-tracker-style', plugin_dir_url(__FILE__) . 'assets/css/progress-tracker.css', [], time(), 'all');
+        wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', [], null, true);
+        wp_enqueue_script('bmi-gauge-script', plugin_dir_url(__FILE__) . 'assets/js/bmi-gauge.js', ['chart-js'], null, true);
+        wp_enqueue_script('bmi-progress-tracker', plugin_dir_url(__FILE__) . 'assets/js/bmi-progress-tracker.js', ['chart-js'], null, true);
+        wp_enqueue_script('bmi-ajax-script', plugin_dir_url(__FILE__) . 'assets/js/bmi-ajax.js', ['jquery', 'chart-js', 'bmi-gauge-script', 'bmi-progress-tracker'], null, true);
 
         wp_localize_script('bmi-ajax-script', 'bmi_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -204,16 +204,16 @@ if (!function_exists('bmi_enqueue_styles_scripts')) {
 }
 add_action('wp_enqueue_scripts', 'bmi_enqueue_styles_scripts');
 
-/**
- * Create database table on plugin activation.
- */
 function bmi_pro_create_table() {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'bmi_pro_data';
     $charset_collate = $wpdb->get_charset_collate();
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    $sql = "CREATE TABLE $table_name (
+    // BMI Data Table
+    $bmi_table = $wpdb->prefix . 'bmi_pro_data';
+    $sql = "CREATE TABLE $bmi_table (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
+        user_id bigint(20) DEFAULT 0,
         name varchar(255) NOT NULL,
         email varchar(255) NOT NULL,
         phone varchar(15),
@@ -224,16 +224,52 @@ function bmi_pro_create_table() {
         bmi float NOT NULL,
         bfp float NOT NULL,
         bmr float NOT NULL,
+        activity_level varchar(20),
+        emotional_state text,
+        fitness_goal varchar(20),
+        calories int,
+        diet_preference varchar(20),
+        gym_sessions int,
+        time_in_gym float,
+        sleep_hours int,
         created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
+    dbDelta($sql);
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    // SMTP Configuration Table
+    $smtp_table = $wpdb->prefix . 'bmi_pro_smtp';
+    $sql = "CREATE TABLE $smtp_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        host varchar(255) NOT NULL,
+        port int NOT NULL,
+        username varchar(255) NOT NULL,
+        password varchar(255) NOT NULL,
+        from_email varchar(255) NOT NULL,
+        from_name varchar(255) NOT NULL,
+        encryption varchar(10) DEFAULT 'tls',
+        is_active tinyint(1) DEFAULT 1,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    dbDelta($sql);
+
+    // API Configuration Table
+    $api_table = $wpdb->prefix . 'bmi_pro_api';
+    $sql = "CREATE TABLE $api_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        service_name varchar(100) NOT NULL,
+        api_key varchar(255) NOT NULL,
+        api_secret varchar(255),
+        endpoint_url varchar(255),
+        service_type varchar(50) NOT NULL,
+        settings text,
+        is_active tinyint(1) DEFAULT 1,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
     dbDelta($sql);
 }
 register_activation_hook(__FILE__, 'bmi_pro_create_table');
-
-// Add admin menu and dashboard widget
-add_action( 'admin_menu', 'bmi_pro_add_admin_menu' );
-add_action( 'wp_dashboard_setup', 'bmi_pro_add_dashboard_widget' );
-?>
